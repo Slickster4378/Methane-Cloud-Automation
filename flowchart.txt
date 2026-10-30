@@ -1,0 +1,32 @@
+MethanePipeline/
+├── config.json
+├── error_log.txt
+├── flowchart.txt
+├── folder_picker.exe
+├── MethanePipeline.bat
+├── requirements.txt
+│
+├── src/
+│   ├── error_logger.py
+│   ├── folder_picker.py
+│   ├── initialize_project.py
+│   ├── build_baseline.py
+│   ├── historical_scan.py
+│   └── check_new_data.py
+│
+└── projects/
+     ├── Tengiz/
+     │	  ├── baseline/
+     │	  ├── cache/
+     │	  ├── database/
+     │	  ├── detections/
+     │	  ├── logs/
+     │	  └── reports/
+     │
+     └── Kokzhide/
+     	  ├── baseline/
+     	  ├── cache/
+     	  ├── database/
+     	  ├── detections/
+     	  ├── logs/
+     	  └── reports/

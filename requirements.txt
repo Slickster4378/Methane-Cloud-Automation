@@ -1,0 +1,11 @@
+rasterio
+numpy
+scipy
+pystac-client
+requests
+shapely
+geopandas
+pyproj
+pandas
+rioxarray
+boto3

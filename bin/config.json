@@ -1,0 +1,39 @@
+{
+    "project_folder": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects",
+    "aois": [
+        {
+            "name": "Tengiz",
+            "paths": {
+                "root": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Tengiz",
+                "baseline": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Tengiz\\baseline",
+                "cache": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Tengiz\\cache",
+                "detections": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Tengiz\\detections",
+                "database": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Tengiz\\database",
+                "logs": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Tengiz\\logs"
+            },
+            "coords": [
+                45.9567,
+                53.2416,
+                46.2082,
+                53.5334
+            ]
+        },
+        {
+            "name": "Kokzhide",
+            "paths": {
+                "root": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Kokzhide",
+                "baseline": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Kokzhide\\baseline",
+                "cache": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Kokzhide\\cache",
+                "detections": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Kokzhide\\detections",
+                "database": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Kokzhide\\database",
+                "logs": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Kokzhide\\logs"
+            },
+            "coords": [
+                52.1234,
+                48.5678,
+                52.4567,
+                48.9012
+            ]
+        }
+    ]
+}
