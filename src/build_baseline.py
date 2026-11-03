@@ -103,8 +103,8 @@ def generate_baseline(aoi: dict, candidates: list[Item], baseline_path: str) -> 
         "CPL_VSIL_CURL_ALLOWED_EXTENSIONS": ".jp2,.tif",
         "AWS_S3_ENDPOINT": "eodata.dataspace.copernicus.eu",
         "AWS_VIRTUAL_HOSTING": "FALSE",
-        "AWS_ACCESS_KEY_ID": "6N7LG8TCCCGGRQW95I32",
-        "AWS_SECRET_ACCESS_KEY": "TBC2QSpuOcvHWSVVzzrb7CNrXeR2lCRHSzeyx5mu",
+        "AWS_ACCESS_KEY_ID": AWS_KEY,
+        "AWS_SECRET_ACCESS_KEY": AWS_SECRET,
     })
 
     bbox = aoi['coords']
