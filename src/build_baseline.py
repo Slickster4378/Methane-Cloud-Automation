@@ -2,62 +2,56 @@
 Baseline Builder v1.0.0
 Crude Accountability
 Created by: Andrew Zitnik
+Last Modified: 11/04/2026
 
 This script streams a baseline image mosaic of the AOI, creating it first if it does not already exist.
 """
 
-import os, sys, rioxarray, xarray, rasterio, boto3 # type: ignore
+import os, sys, rioxarray, xarray, rasterio # type: ignore
 import config_util as cutil
 from pystac.item import Item # type: ignore
-from botocore.exceptions import ClientError # type: ignore
+from pydrive2.auth import GoogleAuth  # type: ignore
+from pydrive2.drive import GoogleDrive  # type: ignore
 from rasterio.session import AWSSession # type: ignore
 
 config = ''
 
-S3_BUCKET_NAME = os.environ.get("USER_CLOUD_BUCKET_NAME", "crude-accountability-baselines")
 AWS_KEY = os.environ.get("USER_AWS_ACCESS_KEY_ID")
 AWS_SECRET = os.environ.get("USER_AWS_SECRET_ACCESS_KEY")
 
-def get_s3_client():
-    """Initializes a secure connection to your private cloud storage vault."""
-    return boto3.client(
-        's3',
-        aws_access_key_id=AWS_KEY,
-        aws_secret_access_key=AWS_SECRET
-    )
+def get_gdrive():
+    """Initializes and authenticates the Google Drive connection."""
+    gauth = GoogleAuth()
+    gauth.LocalWebserverAuth() 
+    return GoogleDrive(gauth)
 
-def check_cloud_copy(aoi_name: str) -> str | None:
+def download_base(aoi_name: str, local_dest_path: str) -> bool:
     """
-    Checks cloud bucket to see if a baseline has already been built.
-    Returns the S3 Key if found, otherwise returns None.
+    Searches Google Drive for an existing baseline file.
+    Downloads it directly to the local project path if found.
     """
-    s3 = get_s3_client()
-    s3_key = f"baselines/{aoi_name}_base.tif"
-    try:
-        s3.head_object(Bucket=S3_BUCKET_NAME, Key=s3_key)
-        print(f"[CLOUD MATCH] Found an existing baseline in the cloud for {aoi_name}.")
-        return s3_key
-    except ClientError as e:
-        if e.response['Error']['Code'] == "404":
-            print(f"[CLOUD MISS] No baseline found in cloud storage for {aoi_name}. Will build fresh.")
-            return None
-        raise e
+    drive = get_gdrive()
+    filename = f"{aoi_name}_base.tif"
+    # Query Google Drive for the specific file name
+    file_list = drive.ListFile({'q': f"title = '{filename}' and trashed = false"}).GetList()
+    if file_list:
+        print(f"[GDRIVE MATCH] Found baseline for {aoi_name} on cloud drive. Downloading locally...")
+        os.makedirs(os.path.dirname(local_dest_path), exist_ok=True)
+        file_list[0].GetContentFile(local_dest_path)
+        print(f"-> Successfully downloaded to: {local_dest_path}")
+        return True
+    print(f"[GDRIVE MISS] No existing baseline found on Google Drive for {aoi_name}.")
+    return False
 
-def cloud_download(s3_key: str, local_path: str) -> None:
-    """Downloads a pre-built baseline directly from  cloud storage."""
-    s3 = get_s3_client()
-    os.makedirs(os.path.dirname(local_path), exist_ok=True)
-    print(f"Downloading baseline from cloud vault -> {local_path}")
-    s3.download_file(S3_BUCKET_NAME, s3_key, local_path)
-    print("Cloud download complete.")
-
-def cloud_upload(local_path: str, aoi_name: str) -> None:
-    """Uploads a newly generated baseline file up to the cloud storage vault."""
-    s3 = get_s3_client()
-    s3_key = f"baselines/{aoi_name}_base.tif"
-    print(f"Uploading fresh baseline copy to cloud storage -> {s3_key}")
-    s3.upload_file(local_path, S3_BUCKET_NAME, s3_key)
-    print("Cloud backup successful.")
+def upload_base(aoi_name: str, local_path: str):
+    """Uploads a newly computed baseline file from local disk up to Google Drive."""
+    drive = get_gdrive()
+    filename = f"{aoi_name}_base.tif"
+    print(f"Uploading fresh baseline copy to Google Drive: {filename}")
+    gdrive_file = drive.CreateFile({'title': filename})
+    gdrive_file.SetContentFile(local_path)
+    gdrive_file.Upload()
+    print("Upload to Google Drive complete!")
 
 def fetch_candidates(aoi: dict) -> list[Item]:
     """
@@ -180,16 +174,16 @@ def main():
     config = cutil.load_json(sys.argv[1])
     for aoi in config['aois']:
         baseline_path = os.path.join(aoi['paths']['baseline'], 'base.tif').replace('\\', '/')
-        if not os.path.exists(baseline_path):
-            cloud_s3_key = check_cloud_copy(aoi['name'])
-            if cloud_s3_key:
-                cloud_download(cloud_s3_key, baseline_path)
-            else:
-                candidates = fetch_candidates(aoi)
-                generate_baseline(aoi, candidates, baseline_path)
-                cloud_upload(baseline_path, aoi['name'])
-        else:
+        if os.path.exists(baseline_path):
             print(f'AOI {aoi['name']} already has a baseline mosaic. Skipping...\n')
+            continue
+        success = download_base(aoi['name'], baseline_path)
+        if success:
+            print('Successfully configured baseline from Google Drive')
+        else:
+            candidates = fetch_candidates(aoi)
+            generate_baseline(aoi, candidates, baseline_path)
+            upload_base(aoi['name'], baseline_path)
 
 if __name__ == "__main__":
     main()

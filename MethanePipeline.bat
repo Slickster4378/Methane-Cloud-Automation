@@ -166,28 +166,11 @@ if exist "%BASELINE_MARKER%" (
     echo 1 > "%BASELINE_MARKER%"
 )
 
-REM 3. Historical Backscan
-set "HISTORICAL_MARKER=%PIPELINE_DIR%bin\.historical_scan_complete"
-if exist "%HISTORICAL_MARKER%" (
-    echo [SKIP] Historical data scanning complete.
-) else (
-    echo Processing historical imagery...
-    "%VENV_PYTHON%" "%PIPELINE_DIR%src\error_logger.py" ^
-        "%ERROR_LOG%" ^
-        "%PIPELINE_DIR%src\historical_scan.py" ^
-        "%CONFIG_FILE%"
-    if errorlevel 1 (
-        call :LOG_ERROR "Historical Scan Failed"
-        goto FAILED 
-    )
-    echo 1 > "%HISTORICAL_MARKER%"
-)
-
-REM 4. Daily Delta Check
+REM 3. Daily Delta Check
 echo Checking for new daily sentinel imagery...
 "%VENV_PYTHON%" "%PIPELINE_DIR%src\error_logger.py" ^
     "%ERROR_LOG%" ^
-    "%PIPELINE_DIR%check_new_data.py" ^
+    "%PIPELINE_DIR%src\check_new_data.py" ^
     "%CONFIG_FILE%"
 if errorlevel 1 (
     call :LOG_ERROR "Daily Data Check Failed"

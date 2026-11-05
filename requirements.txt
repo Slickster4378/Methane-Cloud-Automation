@@ -8,4 +8,4 @@ geopandas
 pyproj
 pandas
 rioxarray
-boto3
+pydrive2

@@ -11,14 +11,16 @@ MethanePipeline/
 │   ├── folder_picker.py
 │   ├── initialize_project.py
 │   ├── build_baseline.py
-│   ├── historical_scan.py
-│   └── check_new_data.py
+│   ├── check_new_data.py
+│   └── update_db.py
 │
 └── projects/
+     ├── database/
+     │	  └── methane.db
+     │
      ├── Tengiz/
      │	  ├── baseline/
      │	  ├── cache/
-     │	  ├── database/
      │	  ├── detections/
      │	  ├── logs/
      │	  └── reports/
@@ -26,7 +28,6 @@ MethanePipeline/
      └── Kokzhide/
      	  ├── baseline/
      	  ├── cache/
-     	  ├── database/
      	  ├── detections/
      	  ├── logs/
      	  └── reports/

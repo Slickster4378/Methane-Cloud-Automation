@@ -2,7 +2,7 @@
 Folder Picker GUI v1.0.0
 Crude Accountability
 Created by: Andrew Zitnik
-Last Modified: 09/02/2026
+Last Modified: 11/04/2026
 
 This script runs a GUI for the user to select a project folder, then loads in the config.json.
 """
@@ -49,6 +49,7 @@ def save_config():
     config = load_config()
     # Update or create values
     config['project_folder'] = selected_folder
+    config['database'] = fr'{selected_folder}\database\methane.db'
     config['aois'] = [
         {
             'name': 'Tengiz',
@@ -57,10 +58,9 @@ def save_config():
                 "baseline": fr'{selected_folder}\Tengiz\baseline',
                 "cache": fr'{selected_folder}\Tengiz\cache',
                 "detections": fr'{selected_folder}\Tengiz\detections',
-                "database": fr'{selected_folder}\Tengiz\database',
                 "logs": fr'{selected_folder}\Tengiz\logs'
             },
-            'coords': [45.9567, 53.2416, 46.2082, 53.5334],
+            'coords': [53.2416, 45.9567, 53.5334, 46.2082],
         },
         {
             'name':'Kokzhide',
@@ -69,7 +69,6 @@ def save_config():
                 "baseline": fr'{selected_folder}\Kokzhide\baseline',
                 "cache": fr'{selected_folder}\Kokzhide\cache',
                 "detections": fr'{selected_folder}\Kokzhide\detections',
-                "database": fr'{selected_folder}\Kokzhide\database',
                 "logs": fr'{selected_folder}\Kokzhide\logs'
             },
             'coords': [52.1234, 48.5678, 52.4567, 48.9012],
