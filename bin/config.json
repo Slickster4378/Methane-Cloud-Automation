@@ -4,7 +4,7 @@
         "username": "Slickster4378",
         "repository": "Methane-Cloud-Automation",
         "branch": "main",
-        "image_folder": "images",
+        "image_folder": "images"
     },
     "database": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\database\\methane.db",
     "aois": [

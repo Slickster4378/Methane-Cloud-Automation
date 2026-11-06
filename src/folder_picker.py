@@ -49,6 +49,12 @@ def save_config():
     config = load_config()
     # Update or create values
     config['project_folder'] = selected_folder
+    config['github'] = {
+        "username": "Slickster4378",
+        "repository": "Methane-Cloud-Automation",
+        "branch": "main",
+        "image_folder": "images"
+    }
     config['database'] = fr'{selected_folder}\database\methane.db'
     config['aois'] = [
         {
