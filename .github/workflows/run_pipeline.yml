@@ -28,10 +28,11 @@ jobs:
 
     - name: Write Dispatched Configuration Payload
       env:
-        Payload: ${{ toJSON(github.event.client_payload) }}
+        PAYLOAD: ${{ toJSON(github.event.client_payload) }}
       run: |
         mkdir -p bin
         printf '%s' "$PAYLOAD" > bin/config.json
+        test -s bin/config.json || { echo 'CRITICAL: Dispatch payload was empty.'; exit 1; }
 
     - name: Run Native Cloud Baseline Builder
       env:

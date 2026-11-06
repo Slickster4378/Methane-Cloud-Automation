@@ -16,7 +16,7 @@ config = ''
 
 AWS_KEY = os.environ.get("CDSE_S3_ACCESS_KEY")
 AWS_SECRET = os.environ.get("CDSE_S3_SECRET_KEY")
-CLOUD_OUTPUT = 'output'
+CLOUD_OUTPUT = 'cloud_out'
 
 def fetch_candidates(aoi: dict) -> list[Item]:
     """
@@ -31,11 +31,13 @@ def fetch_candidates(aoi: dict) -> list[Item]:
     print(f'Creating Baseline: {aoi['name']}')
     print('Connecting to Copernicus STAC to fetch candidates for Cloudless Mosaic Baseline...')
     catalog = cutil.stagger_results('https://stac.dataspace.copernicus.eu/v1')
-    if catalog: search = catalog.search(
+    if not catalog:
+        raise ConnectionError('Could not open the Copernicus STAC catalog.')
+    search = catalog.search(
         collections=['sentinel-2-l2a'],
         bbox=aoi['coords'],
         datetime='2020-01-01/2025-12-31',
-        query={"eo:cloud_cover": {"lt": 10}} 
+        query={"eo:cloud_cover": {"lt": 10}}
     )
     items = list(search.items())
     if len(items) == 0:
@@ -74,7 +76,7 @@ def generate_baseline(aoi: dict, candidates: list[Item], baseline_path: str) -> 
     # Open single AWSSession context targeting the CDSE infrastructure
     processed = 0
     max_img = 30
-    master_coords = None
+    master = None
     with rasterio.Env(AWSSession(endpoint_url="https://eodata.dataspace.copernicus.eu")):
         for item in candidates:
             if processed >= max_img:
@@ -94,15 +96,14 @@ def generate_baseline(aoi: dict, candidates: list[Item], baseline_path: str) -> 
                 print('Streaming B12 (Methane absorption proxy via S3)...')
                 with rioxarray.open_rasterio(b12_url, chunks={'x': 512, 'y': 512}) as b12_src:
                     b12_clipped = b12_src.rio.clip_box(*bbox, crs="EPSG:4326")
-                    if master_coords is not None and b12_clipped.shape == master_coords['shape']:
-                        b12_data = b12_clipped.load()
-                    else:
-                        b12_data = b12_clipped.rio.reproject_match(b11_data).load()
+                    b12_data = b12_clipped.rio.reproject_match(b11_data).load()
                 # Calculate ratio for this specific day
                 b12_data.values[b12_data.values == 0] = 1
                 day_ratio = b11_data / b12_data
-                if processed == 0:
-                    master_coords = {'shape': day_ratio.shape, 'crs': day_ratio.rio.crs}
+                if master is None:
+                    master = day_ratio
+                else:
+                    day_ratio = day_ratio.rio.reproject_match(master)
                 day_ratio = day_ratio.expand_dims(time=[date_str])
                 ratio_maps.append(day_ratio)
                 print(f"-> Processed scene from date: {date_str}")
@@ -115,13 +116,13 @@ def generate_baseline(aoi: dict, candidates: list[Item], baseline_path: str) -> 
 
     # Combine all images along the new time dimension
     print('Calculating absorption ratio...')
-    stacked_ratios = xarray.concat(ratio_maps, dim='time')
+    stacked_ratios = xarray.concat(ratio_maps, dim='time', join='exact')
     print("Calculating temporal median to erase active plumes...")
     baseline_ratio = stacked_ratios.quantile(0.25, dim='time', skipna=True)
     if 'quantile' in baseline_ratio.coords:
         baseline_ratio = baseline_ratio.drop_vars('quantile')
     # Restore GeoTIFF information and save baseline
-    baseline_ratio.rio.write_crs(master_coords['crs'], inplace=True)
+    baseline_ratio.rio.write_crs(master.rio.crs, inplace=True)
     out_path = baseline_path.replace('\\', '/')
     os.makedirs(os.path.dirname(out_path),exist_ok=True)
     print(f"Saving emission-free baseline -> {out_path}")
@@ -140,7 +141,7 @@ def main():
         sys.exit("CRITICAL: Copernicus S3 credentials (CDSE_S3_ACCESS_KEY / CDSE_S3_SECRET_KEY) are not set.")
     config = cutil.load_json(sys.argv[1])
     for aoi in config['aois']:
-        baseline_path = os.path.join(CLOUD_OUTPUT, aoi['name'], 'base.tif').replace('\\', '/')
+        baseline_path = os.path.join(CLOUD_OUTPUT, f"{aoi['name']}_base.tif").replace('\\', '/')
         if os.path.exists(baseline_path):
             print(f"AOI {aoi['name']} already has a baseline mosaic. Skipping...\n")
             continue
