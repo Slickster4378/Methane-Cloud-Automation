@@ -2,7 +2,7 @@
 Config Utility v1.0.0
 Crude Accountability
 Created by: Andrew Zitnik
-Last Modified: 09/01/2026
+Last Modified: 11/05/2026
 
 This file contains utility functions for a config.json file that are shared by multiple scripts.
 """
@@ -11,6 +11,8 @@ import os, json
 from urllib3 import Retry
 from pystac_client import Client # type: ignore
 from pystac_client.stac_api_io import StacApiIO # type: ignore
+
+GITHUB_REPO = os.environ.get('METHANE_REPO', 'Slickster4378/Methane-Cloud-Automation')
 
 def load_json(config_path: str) -> dict:
     """

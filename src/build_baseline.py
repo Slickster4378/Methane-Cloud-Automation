@@ -2,7 +2,7 @@
 Baseline Builder v1.0.0
 Crude Accountability
 Created by: Andrew Zitnik
-Last Modified: 11/04/2026
+Last Modified: 11/05/2026
 
 This script streams a baseline image mosaic of the AOI, creating it first if it does not already exist.
 """
@@ -10,48 +10,13 @@ This script streams a baseline image mosaic of the AOI, creating it first if it 
 import os, sys, rioxarray, xarray, rasterio # type: ignore
 import config_util as cutil
 from pystac.item import Item # type: ignore
-from pydrive2.auth import GoogleAuth  # type: ignore
-from pydrive2.drive import GoogleDrive  # type: ignore
 from rasterio.session import AWSSession # type: ignore
 
 config = ''
 
-AWS_KEY = os.environ.get("USER_AWS_ACCESS_KEY_ID")
-AWS_SECRET = os.environ.get("USER_AWS_SECRET_ACCESS_KEY")
-
-def get_gdrive():
-    """Initializes and authenticates the Google Drive connection."""
-    gauth = GoogleAuth()
-    gauth.LocalWebserverAuth() 
-    return GoogleDrive(gauth)
-
-def download_base(aoi_name: str, local_dest_path: str) -> bool:
-    """
-    Searches Google Drive for an existing baseline file.
-    Downloads it directly to the local project path if found.
-    """
-    drive = get_gdrive()
-    filename = f"{aoi_name}_base.tif"
-    # Query Google Drive for the specific file name
-    file_list = drive.ListFile({'q': f"title = '{filename}' and trashed = false"}).GetList()
-    if file_list:
-        print(f"[GDRIVE MATCH] Found baseline for {aoi_name} on cloud drive. Downloading locally...")
-        os.makedirs(os.path.dirname(local_dest_path), exist_ok=True)
-        file_list[0].GetContentFile(local_dest_path)
-        print(f"-> Successfully downloaded to: {local_dest_path}")
-        return True
-    print(f"[GDRIVE MISS] No existing baseline found on Google Drive for {aoi_name}.")
-    return False
-
-def upload_base(aoi_name: str, local_path: str):
-    """Uploads a newly computed baseline file from local disk up to Google Drive."""
-    drive = get_gdrive()
-    filename = f"{aoi_name}_base.tif"
-    print(f"Uploading fresh baseline copy to Google Drive: {filename}")
-    gdrive_file = drive.CreateFile({'title': filename})
-    gdrive_file.SetContentFile(local_path)
-    gdrive_file.Upload()
-    print("Upload to Google Drive complete!")
+AWS_KEY = os.environ.get("CDSE_S3_ACCESS_KEY")
+AWS_SECRET = os.environ.get("CDSE_S3_SECRET_KEY")
+CLOUD_OUTPUT = 'output'
 
 def fetch_candidates(aoi: dict) -> list[Item]:
     """
@@ -171,19 +136,16 @@ def main():
     global config
     if len(sys.argv) < 2:
         sys.exit("Failure importing config.json")
+    if not AWS_KEY or not AWS_SECRET:
+        sys.exit("CRITICAL: Copernicus S3 credentials (CDSE_S3_ACCESS_KEY / CDSE_S3_SECRET_KEY) are not set.")
     config = cutil.load_json(sys.argv[1])
     for aoi in config['aois']:
-        baseline_path = os.path.join(aoi['paths']['baseline'], 'base.tif').replace('\\', '/')
+        baseline_path = os.path.join(CLOUD_OUTPUT, aoi['name'], 'base.tif').replace('\\', '/')
         if os.path.exists(baseline_path):
-            print(f'AOI {aoi['name']} already has a baseline mosaic. Skipping...\n')
+            print(f"AOI {aoi['name']} already has a baseline mosaic. Skipping...\n")
             continue
-        success = download_base(aoi['name'], baseline_path)
-        if success:
-            print('Successfully configured baseline from Google Drive')
-        else:
-            candidates = fetch_candidates(aoi)
-            generate_baseline(aoi, candidates, baseline_path)
-            upload_base(aoi['name'], baseline_path)
+        candidates = fetch_candidates(aoi)
+        generate_baseline(aoi, candidates, baseline_path)
 
 if __name__ == "__main__":
     main()

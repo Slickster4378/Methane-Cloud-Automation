@@ -149,20 +149,20 @@ if exist "%INIT_MARKER%" (
     echo 1 > "%INIT_MARKER%"
 )
 
-REM 2. Build Baseline
+REM 2. Fetch Baseline
 set "BASELINE_MARKER=%PIPELINE_DIR%bin\.baseline_complete"
 if exist "%BASELINE_MARKER%" (
     echo [SKIP] Methane emission baselines already computed and downloaded.
-) else ( 
-    echo Triggering Cloud Baseline Builder via GitHub API...
-    curl -X POST ^
-      -H "Accept: application/vnd.github+json" ^
-      -H "Authorization: Bearer YOUR_GITHUB_PERSONAL_ACCESS_TOKEN" ^
-      https://github.com ^
-      -d "{\"event_type\": \"trigger_baseline_build\", \"client_payload\": $(type "%CONFIG_FILE%")}"
-      
-    echo Waiting for Cloud Processing to finish and writing baseline back...
-    REM Note: Polling / downloading baseline step fits here
+) else (
+    echo Fetching baselines from GitHub...
+    "%VENV_PYTHON%" "%PIPELINE_DIR%src\error_logger.py" ^
+        "%ERROR_LOG%" ^
+        "%PIPELINE_DIR%src\fetch_baseline.py" ^
+        "%CONFIG_FILE%"
+    if errorlevel 1 (
+        call :LOG_ERROR "Baseline Fetch Failed"
+        goto FAILED
+    )
     echo 1 > "%BASELINE_MARKER%"
 )
 
