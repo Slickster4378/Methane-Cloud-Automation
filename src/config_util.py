@@ -81,3 +81,16 @@ def get_db_path(config: dict) -> str:
         str: Path to methane.db inside the project folder.
     """
     return os.path.join(clean_path(config['project_folder']), 'methane.db')
+
+def get_bbox(aoi: dict) -> list[float]:
+    """
+    Simple helper to extract the bounding box from an AOI dictionary.
+
+    Args:
+        aoi (dict): Parsed json dictionary with aoi info.
+
+    Returns:
+        list[float]: Bounding box in lon/lat order.
+    """
+
+    return aoi['coords']

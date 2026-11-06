@@ -34,7 +34,7 @@ def fetch_candidates(aoi: dict) -> list[Item]:
         raise ConnectionError('Could not open the Copernicus STAC catalog.')
     search = catalog.search(
         collections=['sentinel-2-l2a'],
-        bbox=aoi['coords'],
+        bbox=cutil.get_bbox(aoi),
         datetime='2020-01-01/2025-12-31',
         query={"eo:cloud_cover": {"lt": 10}}
     )
@@ -67,7 +67,7 @@ def generate_baseline(aoi: dict, candidates: list[Item], baseline_path: str) -> 
         "AWS_SECRET_ACCESS_KEY": AWS_SECRET,
     })
 
-    bbox = aoi['coords']
+    bbox = cutil.get_bbox(aoi)
     ratio_maps = []
 
     print(f"Generating methane-free baseline for: {aoi['name']}")

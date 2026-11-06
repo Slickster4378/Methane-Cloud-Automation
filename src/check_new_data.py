@@ -229,7 +229,7 @@ def process_aoi(conn, aoi: dict) -> int:
         int: Number of scenes that failed
     """
     name = aoi['name']
-    bbox = aoi['coords']
+    bbox = cutil.get_bbox(aoi)
     baseline_path = os.path.join(cutil.clean_path(aoi['paths']['baseline']), 'base.tif')
     if not os.path.exists(baseline_path):
         print(f'[SKIP] {name} has no baseline yet.\n')
