@@ -57,4 +57,27 @@ def stagger_results(search: str) -> Client:
         return cat
     except:
         return []
-    
+
+def clean_path(raw_path: str) -> str:
+    """
+    Normalizes a path from config.json (mixed slashes) into an absolute OS path.
+
+    Args:
+        raw_path (str): Path string from config.json.
+
+    Returns:
+        str: Absolute, normalized path.
+    """
+    return os.path.abspath(raw_path.replace('\\', '/'))
+
+def get_db_path(config: dict) -> str:
+    """
+    Builds the path to the single pipeline database shared by every AOI.
+
+    Args:
+        config (dict): Parsed configuration.
+
+    Returns:
+        str: Path to methane.db inside the project folder.
+    """
+    return os.path.join(clean_path(config['project_folder']), 'methane.db')

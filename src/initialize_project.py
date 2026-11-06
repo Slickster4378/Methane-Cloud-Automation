@@ -43,7 +43,7 @@ def initialize_database():
     """
     Creates the single SQLite database for the project if it does not already exist.
     """
-    database_path = config['database']
+    database_path = cutil.get_db_path(config)
     if os.path.exists(database_path):
         print('Project has an active tracking database. Skipping build.')
         return
@@ -66,7 +66,7 @@ def initialize_database():
             plume_detected INTEGER DEFAULT 0,
             cache_directory TEXT,
             PRIMARY KEY (aoi, image_id)
-        ) WITHOUT ROWID
+        )
     """)
 
     # Methane Plume Detections (one row per detected scene per AOI)
@@ -79,7 +79,6 @@ def initialize_database():
             max_anomaly REAL,
             plume_pixels INTEGER,
             raster_directory TEXT,
-            UNIQUE (aoi, image_id),
             FOREIGN KEY (aoi, image_id)
                 REFERENCES images (aoi, image_id)
         )
@@ -92,11 +91,12 @@ def initialize_database():
             value TEXT
         )
     """)
+
+    rows = [('database_version', '1.0.0')]
+    rows += [(f"last_scene_{aoi['name']}", '') for aoi in config['aois']]
     cursor.executemany("""
         INSERT OR IGNORE INTO metadata (key, value) VALUES (?, ?)
-    """, [('database_version', '2.0.0')] + [
-        (f"last_scene_processed:{aoi['name']}", '') for aoi in config['aois']
-    ])
+    """, rows)
 
     connection.commit()
     connection.close()
