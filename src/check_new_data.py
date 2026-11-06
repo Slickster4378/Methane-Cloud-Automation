@@ -15,7 +15,6 @@ import update_db as udb
 from datetime import datetime, timedelta, timezone
 from pystac.item import Item # type: ignore
 from scipy import ndimage # type: ignore
-from rasterio.session import AWSSession # type: ignore
 from rioxarray.exceptions import NoDataInBounds # type: ignore
 
 config = {}
@@ -324,7 +323,7 @@ def main():
     conn = udb.connect(config)
     failures = 0
     try:
-        with rasterio.Env(AWSSession(endpoint_url="https://eodata.dataspace.copernicus.eu")):
+        with rasterio.Env(AWS_S3_ENDPOINT='eodata.dataspace.copernicus.eu', AWS_VIRTUAL_HOSTING='FALSE'):
             for aoi in config['aois']:
                 failures += process_aoi(conn, aoi)
     finally:

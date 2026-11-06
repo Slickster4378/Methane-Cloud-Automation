@@ -10,7 +10,6 @@ This script streams a baseline image mosaic of the AOI, creating it first if it 
 import os, sys, rioxarray, xarray, rasterio # type: ignore
 import config_util as cutil
 from pystac.item import Item # type: ignore
-from rasterio.session import AWSSession # type: ignore
 
 config = ''
 
@@ -77,7 +76,7 @@ def generate_baseline(aoi: dict, candidates: list[Item], baseline_path: str) -> 
     processed = 0
     max_img = 30
     master = None
-    with rasterio.Env(AWSSession(endpoint_url="https://eodata.dataspace.copernicus.eu")):
+    with rasterio.Env(AWS_S3_ENDPOINT='eodata.dataspace.copernicus.eu', AWS_VIRTUAL_HOSTING='FALSE'):
         for item in candidates:
             if processed >= max_img:
                 break
@@ -90,11 +89,11 @@ def generate_baseline(aoi: dict, candidates: list[Item], baseline_path: str) -> 
             try:
                 # --- PROCESS BANDS ---
                 print('Streaming B11 (Continuum proxy via S3)...')
-                with rioxarray.open_rasterio(b11_url, chunks={'x': 512, 'y': 512}) as b11_src:
+                with rioxarray.open_rasterio(b11_url) as b11_src:
                     b11_clipped = b11_src.rio.clip_box(*bbox, crs="EPSG:4326")
                     b11_data = b11_clipped.load()
                 print('Streaming B12 (Methane absorption proxy via S3)...')
-                with rioxarray.open_rasterio(b12_url, chunks={'x': 512, 'y': 512}) as b12_src:
+                with rioxarray.open_rasterio(b12_url) as b12_src:
                     b12_clipped = b12_src.rio.clip_box(*bbox, crs="EPSG:4326")
                     b12_data = b12_clipped.rio.reproject_match(b11_data).load()
                 # Calculate ratio for this specific day
