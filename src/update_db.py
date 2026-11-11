@@ -2,12 +2,12 @@
 Update Database v1.0.0
 Crude Accountability
 Created by: Andrew Zitnik
-Last Modified: 11/05/2026
+Last Modified: 11/10/2026
 
 This script holds the database functions that check_new_data.py uses to read and write the single pipeline database.
 """
 
-import sqlite3
+import os, sqlite3
 from datetime import datetime
 import config_util as cutil
 
@@ -18,6 +18,7 @@ def timestamp() -> str:
 def connect(config: dict) -> sqlite3.Connection:
     """
     Opens a connection to the pipeline database.
+    Refuses to create a new file, because sqlite3 silently makes an empty one that has no tables.
 
     Args:
         config (dict): Parsed configuration.
@@ -25,7 +26,10 @@ def connect(config: dict) -> sqlite3.Connection:
     Returns:
         sqlite3.Connection: Open database connection.
     """
-    return sqlite3.connect(cutil.get_db_path(config))
+    db_path = cutil.get_db_path(config)
+    if not os.path.isfile(db_path):
+        raise FileNotFoundError(f'Pipeline database not found:\n{db_path}')
+    return sqlite3.connect(db_path)
 
 def get_watermark(conn: sqlite3.Connection, aoi_name: str) -> str:
     """

@@ -78,9 +78,9 @@ def get_db_path(config: dict) -> str:
         config (dict): Parsed configuration.
 
     Returns:
-        str: Path to methane.db inside the project folder.
+        str: Path to methane.db, as set by the 'database' key in config.json.
     """
-    return os.path.join(get_project_folder(config), 'methane.db')
+    return clean_path(config['database'])
 
 def get_bbox(aoi: dict) -> list[float]:
     """

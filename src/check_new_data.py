@@ -2,7 +2,7 @@
 Check New Data v1.0.0
 Crude Accountability
 Created by: Andrew Zitnik
-Last Modified: 11/05/2026
+Last Modified: 11/10/2026
 
 This script checks Copernicus for Sentinel-2 scenes acquired since the last processed scene of each AOI,
 builds the day's B11/B12 ratio image, flags plumes against the baseline, saves the image locally and to GitHub,
@@ -217,6 +217,19 @@ def upload_to_github(local_path: str, repo_path: str) -> None:
     else:
         raise RuntimeError(f'GitHub upload failed ({response.status_code}): {response.text[:200]}')
 
+def load_baseline(path: str):
+    """
+    Loads the baseline raster into memory and closes the file handle immediately.
+
+    Args:
+        path (str): Path to the baseline GeoTIFF
+
+    Returns:
+        DataArray: Fully loaded baseline raster
+    """
+    with rioxarray.open_rasterio(path) as src:
+        return src.load()
+    
 def process_aoi(conn, aoi: dict) -> int:
     """
     Processes every new scene for one AOI.
@@ -245,7 +258,7 @@ def process_aoi(conn, aoi: dict) -> int:
     if not scenes:
         return 0
 
-    baseline = rioxarray.open_rasterio(baseline_path).load()   # loaded once per AOI, not per scene
+    baseline = None
     cache_dir = cutil.clean_path(aoi['paths']['cache'])
     detect_dir = cutil.clean_path(aoi['paths']['detections'])
     gh_folder = config.get('github', {}).get('image_folder', 'images')
@@ -263,6 +276,9 @@ def process_aoi(conn, aoi: dict) -> int:
             if not blocked:
                 mark = acquired
             continue
+
+        if baseline is None:
+            baseline = load_baseline(baseline_path)
 
         scene = {
             'image_id': image_id,
