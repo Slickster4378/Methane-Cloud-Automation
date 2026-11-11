@@ -2,12 +2,12 @@
 Config Utility v1.0.0
 Crude Accountability
 Created by: Andrew Zitnik
-Last Modified: 11/05/2026
+Last Modified: 11/10/2026
 
 This file contains utility functions for a config.json file that are shared by multiple scripts.
 """
 
-import os, json
+import os, json, sys
 from urllib3 import Retry
 from pystac_client import Client # type: ignore
 from pystac_client.stac_api_io import StacApiIO # type: ignore
@@ -80,7 +80,7 @@ def get_db_path(config: dict) -> str:
     Returns:
         str: Path to methane.db inside the project folder.
     """
-    return os.path.join(clean_path(config['project_folder']), 'methane.db')
+    return os.path.join(get_project_folder(config), 'methane.db')
 
 def get_bbox(aoi: dict) -> list[float]:
     """
@@ -94,3 +94,23 @@ def get_bbox(aoi: dict) -> list[float]:
     """
 
     return aoi['coords']
+
+def get_project_folder(config: dict) -> str:
+    """
+    Builds the absolute path to the local project folder chosen in the folder picker.
+
+    Args:
+        config (dict): Parsed configuration.
+
+    Returns:
+        str: Absolute, normalized path to the project folder.
+    """
+    return clean_path(config['project_folder'])
+
+def main():
+    if len(sys.argv) < 2:
+        sys.exit("Usage: python config_util.py <path_to_config.json>")
+    print(get_project_folder(load_json(sys.argv[1])))
+
+if __name__ == '__main__':
+    main()

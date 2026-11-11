@@ -25,10 +25,10 @@ GITHUB_TOKEN = os.environ.get('GITHUB_PAT')
 
 # Search and detection settings (starting values, tune against real scenes)
 LOOKBACK_DAYS = 10                  # only used the first time an AOI is checked
-MAX_CLOUD = 65                      # max scene-level cloud cover (%)
-MIN_COVERAGE = 0.25                  # min fraction of the AOI that must be clear, valid pixels
-ANOMALY_SIGMA = 5.0                 # robust z-score a pixel must exceed
-MIN_PLUME_PIXELS = 20               # smallest connected cluster that counts as a plume
+MAX_CLOUD = 75                      # max scene-level cloud cover (%)
+MIN_COVERAGE = 0.10                 # min fraction of the AOI that must be clear, valid pixels
+ANOMALY_SIGMA = 3.0                 # robust z-score a pixel must exceed
+MIN_PLUME_PIXELS = 10               # smallest connected cluster that counts as a plume
 BAD_SCL = [0, 1, 3, 8, 9, 10, 11]   # no data, saturated, cloud shadow, cloud (med/high), cirrus, snow
 
 def configure_gdal() -> None:

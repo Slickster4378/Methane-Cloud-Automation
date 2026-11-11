@@ -129,11 +129,27 @@ echo "%CONFIG_FILE%"
 echo.
 
 REM ------------------------------------------
+REM Locate local project folder (holds run markers)
+REM ------------------------------------------
+
+set "PROJECT_DIR="
+for /f "delims=" %%A in ('""%VENV_PYTHON%" "%PIPELINE_DIR%src\config_util.py" "%CONFIG_FILE%""') do set "PROJECT_DIR=%%A"
+if not defined PROJECT_DIR (
+    call :LOG_ERROR "Could not read project_folder from config.json."
+    goto FAILED
+)
+set "INIT_MARKER=%PROJECT_DIR%\.project_initialized"
+set "BASELINE_MARKER=%PROJECT_DIR%\.baseline_complete"
+
+echo Project folder:
+echo "%PROJECT_DIR%"
+echo.
+
+REM ------------------------------------------
 REM Run pipeline
 REM ------------------------------------------
 
 REM 1. Project Initialization
-set "INIT_MARKER=%PIPELINE_DIR%bin\.project_initialized"
 if exist "%INIT_MARKER%" (
     echo [SKIP] Project folders and databases already initialized.
 ) else (
@@ -150,7 +166,6 @@ if exist "%INIT_MARKER%" (
 )
 
 REM 2. Fetch Baseline
-set "BASELINE_MARKER=%PIPELINE_DIR%bin\.baseline_complete"
 if exist "%BASELINE_MARKER%" (
     echo [SKIP] Methane emission baselines already computed and downloaded.
 ) else (

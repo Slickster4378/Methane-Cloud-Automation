@@ -1,21 +1,21 @@
 {
-    "project_folder": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects",
+    "project_folder": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/Projects",
     "github": {
         "username": "Slickster4378",
         "repository": "Methane-Cloud-Automation",
         "branch": "main",
         "image_folder": "images"
     },
-    "database": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\database\\methane.db",
+    "database": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/Projects\\database\\methane.db",
     "aois": [
         {
             "name": "Tengiz",
             "paths": {
-                "root": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Tengiz",
-                "baseline": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Tengiz\\baseline",
-                "cache": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Tengiz\\cache",
-                "detections": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Tengiz\\detections",
-                "logs": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Tengiz\\logs"
+                "root": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/Projects\\Tengiz",
+                "baseline": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/Projects\\Tengiz\\baseline",
+                "cache": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/Projects\\Tengiz\\cache",
+                "detections": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/Projects\\Tengiz\\detections",
+                "logs": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/Projects\\Tengiz\\logs"
             },
             "coords": [
                 53.2416,
@@ -27,11 +27,11 @@
         {
             "name": "Kokzhide",
             "paths": {
-                "root": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Kokzhide",
-                "baseline": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Kokzhide\\baseline",
-                "cache": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Kokzhide\\cache",
-                "detections": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Kokzhide\\detections",
-                "logs": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/MethaneDetectorDist/projects\\Kokzhide\\logs"
+                "root": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/Projects\\Kokzhide",
+                "baseline": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/Projects\\Kokzhide\\baseline",
+                "cache": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/Projects\\Kokzhide\\cache",
+                "detections": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/Projects\\Kokzhide\\detections",
+                "logs": "C:/Users/TheDu/Desktop/Work/Crude/Kazakhstan/Projects\\Kokzhide\\logs"
             },
             "coords": [
                 52.1234,
