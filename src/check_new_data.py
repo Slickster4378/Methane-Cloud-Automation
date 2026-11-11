@@ -193,7 +193,7 @@ def upload_to_github(local_path: str, repo_path: str) -> None:
         repo_path (str): Destination path inside the repository
     """
     gh = config['github']
-    url = f"https://api.github.com/repos/{gh['repo']}/contents/{repo_path}"
+    url = f"https://api.github.com/repos/{cutil.GITHUB_REPO}/contents/{repo_path}"
     with open(local_path, 'rb') as f:
         content = base64.b64encode(f.read()).decode('ascii')
     response = requests.put(
@@ -300,7 +300,7 @@ def process_aoi(conn, aoi: dict) -> int:
                 status = 'PLUME DETECTED' if result['detected'] else 'no plume'
                 print(f'-> Processed {image_id} ({date}): {status}')
         except Exception as e:
-            print(f'FAILED scene {image_id} for {name}: {e}', file=sys.stderr)
+            print(f'FAILED scene {image_id} for {name}: {type(e).__name__}: {e}', file=sys.stderr)
             blocked = True   # watermark stops here so this scene is retried next run
             failures += 1
             continue
